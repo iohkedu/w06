@@ -101,7 +101,7 @@ data SimpleRobot =
 -- | Semantics for faithfully translating the 'Robot'-DSL into the simplified 'SimpleRobot'-DSL.
 --
 -- >>> foldRobot simpleSem $ (Go 1 `Seq` Go 2) `Seq` Go 3
--- SimpleGo 1 (SimpleGo 2 (SimpleGo 3))
+-- SimpleGo 1 (SimpleGo 2 (SimpleGo 3 SimpleRest))
 --
 -- >>> foldRobot simpleSem $ Repeat 4 $ Go 2 `Seq` TurnLeft
 -- SimpleGo 2 (SimpleTurnLeft (SimpleGo 2 (SimpleTurnLeft (SimpleGo 2 (SimpleTurnLeft (SimpleGo 2 (SimpleTurnLeft SimpleRest)))))))
@@ -137,7 +137,7 @@ instance Arbitrary Robot where
 -- | States that energy consumption of a command in the 'Robot'-DSL as specified by 'energySem'
 -- is the same as energy consumption of the translated command in the 'SimpleRobot'-DSL as specified by 'simpleEnergySem'.
 --
--- prop> prop_enery_simpleEnery
+-- prop> prop_energy_simpleEnergy
 --
 prop_energy_simpleEnergy :: Robot -> Property
 prop_energy_simpleEnergy = error "TODO: implement prop_energy_simpleEnergy"

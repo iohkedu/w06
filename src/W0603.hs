@@ -89,7 +89,7 @@ varsSem = PropSem
 --
 -- >>> let Just env = sat (Var "x" `And` (Not $ Var "y")) in env <$> ["x", "y"]
 -- [True,False]
--- >>> const () <$> sat (Var "x" And (Not $ Var "x"))
+-- >>> const () <$> sat (Var "x" `And` (Not $ Var "x"))
 -- Nothing
 --
 sat :: Prop -> Maybe Env
@@ -113,24 +113,25 @@ data NandSem d = NandSem
 -- >>> foldNand (NandSem Var' Nand) $ Var' "x" `Nand` (Var' "y" `Nand` Var' "z")
 -- Nand (Var' "x") (Nand (Var' "y") (Var' "z"))
 --
-foldNand :: NandSem d -> Nand -> Env -> d
+foldNand :: NandSem d -> Nand -> d
 foldNand = error "TODO: implement foldNand"
 
 -- | Describes the semantics of evaluating a proposition given in the 'Nand'-DSL
 -- in an environment.
 --
--- >>> foldNand evalNandSem (Var' "x" `Nand` Var' "x") empty
+-- >>> foldNand evalSem (Var' "x" `Nand` Var' "x") empty
 -- True
--- >>> foldNand evalNandSem (Var' "x" `Nand` (Var' "x" `Nand` Var' "y") empty
+-- >>> foldNand evalSem (Var' "x" `Nand` (Var' "x" `Nand` Var' "y")) empty
 -- True
--- >>> foldNand evalNandSem (Var' "x" `Nand` (Var' "x" `Nand` Var' "y") $ extend "x" True empty
+-- >>> foldNand evalSem (Var' "x" `Nand` (Var' "x" `Nand` Var' "y")) $ extend "x" True empty
 -- False
 --
 evalSem' :: NandSem (Env -> Bool)
 evalSem' = error "TODO: implement evalSem'"
 
 -- | Describes the semantics of converting a proposition expressed in the 'Prop'-DSL
--- into an equivalent 'Nand'-form.
+-- into an equivalent 'Nand'-form.We consider two propositions to be equivalent when
+-- they evaluate to the same truth value in every environment.
 --
 -- >>> let bs   = [True, False]
 -- >>> let envs = [extend "x" x $ extend "y" y $ extend "z" z empty | x <- bs, y <- bs, z <- bs]

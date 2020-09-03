@@ -11,7 +11,7 @@ module W0602
     , intSetSem
     ) where
 
-import Data.IntSet (IntSet)
+import Data.Set (Set)
 
 -- | A DSL for describing finite sets of integers.
 data FinSet =
@@ -44,7 +44,7 @@ foldFinSet = error "TODO: implement foldFinSet"
 -- True
 -- >>> foldFinSet elemSem (Interval 10 9 `Union` Interval 1 8) 2
 -- True
--- >>> foldFinSet elemSem (Interval 1 4 `Intersect` Interval 5 10) 5
+-- >>> foldFinSet elemSem (Interval 1 4 `Intersection` Interval 5 10) 5
 -- False
 --
 elemSem :: FinSetSem (Integer -> Bool)
@@ -63,15 +63,15 @@ elemSem = error "TODO: implement elemSem"
 -- Just (5,10)
 --
 minMaxSem :: FinSetSem (Maybe (Integer, Integer))
-minMaxSem = error "TODO: implement boundsSem"
+minMaxSem = error "TODO: implement minMaxSem"
 
 -- Subtask W6.2.4
 
--- | Defines semantics to convert a 'FinSet' into the 'IntSet' representing
+-- | Defines semantics to convert a 'FinSet' into the @'Set' 'Integer'@ representing
 -- the same set of 'Integer's.
 --
 -- >>> foldFinSet intSetSem $ Interval 1 5 `Intersection` (Interval 0 1 `Union` (Interval 4 20))
 -- fromList [1,4,5]
 --
-intSetSem :: FinSetSem IntSet
+intSetSem :: FinSetSem (Set Integer)
 intSetSem = error "TODO: implement intSetSem"
