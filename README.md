@@ -86,15 +86,15 @@ which checks that energy consumption for a `Robot`-command does not change
 when we first translate to a `SimpleRobot`-command and calculate energy consumption
 afterwards.
 
-## W6.2 Sets of Integers
+## W6.2 Finite Sets of Integers
 
 Consider the following DSL for describing _finite sets of integers_:
 
 ```
 data FinSet =
       Interval Integer Integer
-    | Union FinSet FinSet        -- ^ The union of the two given sets.
-    | Intersection FinSet FinSet -- ^ The intersection of the two given sets.
+    | Union FinSet FinSet
+    | Intersection FinSet FinSet
 ```
 
 ### W6.2.1
@@ -119,3 +119,102 @@ that allow you to compute minimum and maximum of a `FinSet`
 
 Define semantics `intSetSem :: FinSetSem IntSet` to convert a `FinSet` into the
 `IntSet` (from `Data.IntSet`) representing the same set of integers.
+
+## W6.3 Propositions
+
+Recall the DSL for _propositions_ and related definitions from the lecture:
+
+```
+data Prop =
+      Var String
+    | T
+    | F
+    | Not Prop
+    | And Prop Prop
+    | Or Prop Prop
+    deriving (Show, Eq)
+
+data PropSem d = PropSem
+    { var_ :: String -> d
+    , t_   :: d
+    , f_   :: d
+    , not_ :: d -> d
+    , and_ :: d -> d -> d
+    , or_  :: d -> d -> d
+    }
+
+foldProp :: PropSem d -> Prop -> d
+foldProp PropSem{ var_, t_, f_, not_, and_, or_ } = go
+  where
+    go (Var s)   = var_ s
+    go T         = t_
+    go F         = f_
+    go (Not p)   = not_ $ go p
+    go (And p q) = and_ (go p) (go q)
+    go (Or p q)  = or_ (go p) (go q)
+
+type Env = String -> Bool
+
+empty :: Env
+empty = const False
+
+extend :: String -> Bool -> Env -> Env
+extend s b env = \s' -> if s' == s then b else env s'
+
+evalSem :: PropSem (Env -> Bool)
+evalSem = PropSem
+    { var_ = flip ($)
+    , t_   = const True
+    , f_   = const False
+    , not_ = (not .)
+    , and_ = \p q env -> p env && q env
+    , or_  = \p q env -> p env || q env
+    }
+
+varsSem :: PropSem (Set String)
+varsSem = PropSem
+    { var_ = S.singleton
+    , t_   = S.empty
+    , f_   = S.empty
+    , not_ = id
+    , and_ = S.union
+    , or_  = S.union
+    }
+```
+
+### Subtask W6.3.1
+
+Implement a function `sat :: Prop -> Maybe Env` which checks
+whether the given `Prop` is _satisfiable_,
+i.e. whether there exists an environment in which the proposition evaluates to `True`.
+If yes, `Just` such an environment is returned.
+If no, `Nothing` is returned.
+
+### Subtask W6.3.2
+
+It is a well-known fact that instead of using `not`, `(&&)` and `(||)`
+to construct propositions, just using the single function
+
+```
+nand :: Bool -> Bool -> Bool`
+nand x y = not $ x && y
+```
+
+is sufficient.
+
+Consider the following DSL for expressing propositions using the `nand`-operation:
+
+```
+data Nand = Var' String | Nand Nand Nand
+```
+
+Define type `NandSem d` for semantics of the `Nand`-DSL
+and the associated catamorphism `foldNand :: NandSem d -> Nand -> d`.
+
+Define semantics `evalSem' :: NandSem (Env -> Bool)` to evaluate
+`Nand`-expressions in an environment.
+
+Finally, define semantics `nandSem :: PropSem Nand` to convert
+from the `Prop`-DSL to equivalent propositions in the `Nand`-DSL.
+
+

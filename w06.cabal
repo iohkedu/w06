@@ -14,6 +14,7 @@ library
   hs-source-dirs:       src
   Exposed-Modules:      W0601
                       , W0602
+                      , W0603
   build-depends:        base == 4.14.0.0
                       , containers
                       , mtl
