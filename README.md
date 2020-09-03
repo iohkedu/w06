@@ -85,3 +85,37 @@ property `prop_energy_simpleEnergy :: Robot -> Property`
 which checks that energy consumption for a `Robot`-command does not change
 when we first translate to a `SimpleRobot`-command and calculate energy consumption
 afterwards.
+
+## W6.2 Sets of Integers
+
+Consider the following DSL for describing _finite sets of integers_:
+
+```
+data FinSet =
+      Interval Integer Integer
+    | Union FinSet FinSet        -- ^ The union of the two given sets.
+    | Intersection FinSet FinSet -- ^ The intersection of the two given sets.
+```
+
+### W6.2.1
+
+Define type `FinSetSem d` to describe semantics of type `d` for the `FinSet`-DSL
+and implement the corresponding catamorphism
+`foldFinSet :: FinSetSem d -> FinSet -> d`.
+
+### W6.2.2
+
+Implement semantics `elemSem :: FinSetSem (Integer -> Bool)`
+for `FinSet` which allow you to decide whether a given integer
+is an element of the given set.
+
+### W6.2.3
+
+Implement semantics `minMaxSem :: FinSetSem (Maybe (Integer, Integer))`
+that allow you to compute minimum and maximum of a `FinSet`
+(or `Nothing` if the set is empty).
+
+### W6.2.4
+
+Define semantics `intSetSem :: FinSetSem IntSet` to convert a `FinSet` into the
+`IntSet` (from `Data.IntSet`) representing the same set of integers.
